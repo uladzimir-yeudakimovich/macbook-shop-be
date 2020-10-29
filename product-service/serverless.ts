@@ -20,6 +20,7 @@ const serverlessConfiguration: Serverless = {
     name: 'aws',
     runtime: 'nodejs12.x',
     region: 'eu-west-1',
+    stage: 'dev',
     apiGateway: {
       minimumCompressionSize: 1024,
     },
@@ -34,7 +35,7 @@ const serverlessConfiguration: Serverless = {
         {
           http: {
             method: 'get',
-            path: 'get-products-list',
+            path: 'products',
             cors: true
           }
         }
@@ -46,7 +47,7 @@ const serverlessConfiguration: Serverless = {
         {
           http: {
             method: 'get',
-            path: 'get-product',
+            path: 'products/{productId}',
             cors: true
           }
         }
