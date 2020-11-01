@@ -1,9 +1,9 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import 'source-map-support/register';
-const productList = require('../productList.json');
+import productList from '../productList.json';
 
 export const getProductsById: APIGatewayProxyHandler = async (event, _contex) => {
-  const product = productList.find(el => el.id === event.pathParameters.productId);
+  const product = await productList.find(el => el.id === event.pathParameters.productId);
   return {
     statusCode: 200,
     headers: {
