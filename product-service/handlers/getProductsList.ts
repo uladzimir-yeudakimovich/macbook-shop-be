@@ -1,9 +1,9 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
+// import { APIGatewayProxyHandler } from 'aws-lambda';
 import 'source-map-support/register';
 import { corsHeaders } from '../utils/corsHeaders';
 import productList from '../data/productList.json';
 
-export const getProductsList: APIGatewayProxyHandler = async () => {
+export const getProductsList = async () => {
   try {
     return {
       statusCode: 200,

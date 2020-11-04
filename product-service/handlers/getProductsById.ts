@@ -1,13 +1,12 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
+// import { APIGatewayProxyHandler } from 'aws-lambda';
 import 'source-map-support/register';
 import { corsHeaders } from '../utils/corsHeaders';
 import productList from '../data/productList.json';
-import { Product } from '../models/product';
 
-export const getProductsById: APIGatewayProxyHandler = async (event) => {
-  const { productId } = event.pathParameters;
-  const product: Product = await productList.find(el => el.id === productId);
+export const getProductsById = async event => {
   try {
+    const { productId } = event.pathParameters;
+    const product = await productList.find(el => el.id === productId);
     return {
       statusCode: product ? 200 : 404,
       headers: corsHeaders,

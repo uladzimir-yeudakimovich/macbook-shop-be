@@ -11,7 +11,7 @@
     "target": "es2017",
     "outDir": "lib"
   },
-  "include": ["./**/*.ts", "tests/getProductsList.test.js"],
+  "include": ["./**/*.ts", "tests/getProductsList.test.ts"],
   "exclude": [
     "node_modules/**/*",
     ".serverless/**/*",
