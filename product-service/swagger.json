@@ -1,0 +1,115 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "macbook-shop",
+    "description": "macbook-shop",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://virtserver.swaggerhub.com/uladzimir-yeudakimovich/product-service/1.0.0",
+      "description": "SwaggerHub API Auto Mocking"
+    },
+    {
+      "url": "https://6ensb26b5m.execute-api.eu-west-1.amazonaws.com/dev",
+      "description": "SwaggerHub API"
+    }
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "summary": "Get products",
+        "description": "Get products\n",
+        "operationId": "getProducts",
+        "responses": {
+          "200": {
+            "description": "Results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{productId}": {
+      "get": {
+        "summary": "Get product by Id",
+        "description": "Get product by Id",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "ID of product",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Product": {
+        "required": [
+          "count",
+          "id",
+          "price",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number",
+            "example": 6
+          },
+          "description": {
+            "type": "string",
+            "example": "13' 2019 TouchBar - 1.4GHz i5 - 8GB RAM - 128GB SSD (Renewed)"
+          },
+          "id": {
+            "type": "string",
+            "example": "7567ec4b-b10c-48c5-9345-fc73c48a80a0"
+          },
+          "price": {
+            "type": "number",
+            "example": 1120
+          },
+          "title": {
+            "type": "string",
+            "example": "Apple MacBook Pro"
+          },
+          "imgage": {
+            "type": "string",
+            "example": "https://m.media-amazon.com/images/I/51FWf+esWHL._AC_UY327_FMwebp_QL65_.jpg"
+          }
+        }
+      }
+    }
+  }
+}
