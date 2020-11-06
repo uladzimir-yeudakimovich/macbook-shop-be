@@ -1,16 +1,24 @@
 // import { APIGatewayProxyHandler } from 'aws-lambda';
 import 'source-map-support/register';
+import { Client } from 'pg';
+import { dbOptions } from '../utils/dbOptions';
 import { corsHeaders } from '../utils/corsHeaders';
-import productList from '../data/productList.json';
 
 export const getProductsById = async event => {
-  try {
-    const { productId } = event.pathParameters;
-    const product = await productList.find(el => el.id === productId);
+  const client = new Client(dbOptions);
+  await client.connect();
+  const productId = event.pathParameters?.productId;
+  try {  
+    const { rows: product } = await client.query(`
+      SELECT s.count, p.description, p.id, p.price, p.title, p.image
+      FROM products p
+      LEFT JOIN stocks s ON p.id = s.product_id
+      WHERE p.id = ('${productId}')
+    `);
     return {
-      statusCode: product ? 200 : 404,
+      statusCode: product.length ? 200 : 404,
       headers: corsHeaders,
-      body: JSON.stringify(product ? product : { message: 'Product not found' })
+      body: JSON.stringify(product.length ? product[0] : { message: 'Product not found' })
     };
   } catch (error) {
     console.log(error);
@@ -19,5 +27,7 @@ export const getProductsById = async event => {
       headers: corsHeaders,
       body: JSON.stringify({ message: 'Error while reading data' }),
     };
+  } finally {
+    client.end();
   }
 }

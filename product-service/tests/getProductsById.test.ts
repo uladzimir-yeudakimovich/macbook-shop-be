@@ -9,7 +9,7 @@ test('should return product', async () => {
 });
 
 test('should return 404 if product not found', async () => {
-  const product = await getProductsById({ pathParameters: { productId: 'c48a80aa' }});
+  const product = await getProductsById({ pathParameters: { productId: '8467ec4b-b10c-48c5-9345-fc73c48a80aa' } });
   expect(product.statusCode).toEqual(404);
   expect(product.headers).toEqual(corsHeaders);
   expect(product.body).toEqual("{\"message\":\"Product not found\"}");
