@@ -1,7 +1,6 @@
 import type { Serverless } from 'serverless/aws';
-import { dbOptions } from './utils/dbOptions';
 
-const { host, port, database, user, password } = dbOptions;
+const { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD } = process.env;
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -14,7 +13,7 @@ const serverlessConfiguration: Serverless = {
       includeModules: true
     },
   },
-  plugins: ['serverless-webpack'],
+  plugins: ['serverless-webpack', 'serverless-dotenv-plugin'],
   provider: {
     name: 'aws',
     runtime: 'nodejs12.x',
@@ -23,7 +22,7 @@ const serverlessConfiguration: Serverless = {
     apiGateway: {
       minimumCompressionSize: 1024,
     },
-    environment: { host, port, database, user, password },
+    environment: { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD },
   },
   functions: {
     getProductsList: {
