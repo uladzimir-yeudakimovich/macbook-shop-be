@@ -15,9 +15,16 @@ test('should return 404 if product not found', async () => {
   expect(product.body).toEqual("{\"message\":\"Product not found\"}");
 });
 
-test('should return error if path parameter empty', async () => {
-  const product = await getProductsById({});
-  expect(product.statusCode).toEqual(500);
+test('should return 400 if path parameter empty', async () => {
+  const product = await getProductsById({ pathParameters: null });
+  expect(product.statusCode).toEqual(400);
   expect(product.headers).toEqual(corsHeaders);
-  expect(product.body).toEqual("{\"message\":\"Error while reading data\"}");
+  expect(product.body).toEqual("{\"message\":\"Bad request, parameter id is required\"}");
+});
+
+test('should return 400 if id parameter empty', async () => {
+  const product = await getProductsById({ pathParameters: { productId: null } });
+  expect(product.statusCode).toEqual(400);
+  expect(product.headers).toEqual(corsHeaders);
+  expect(product.body).toEqual("{\"message\":\"Bad request, parameter id is required\"}");
 });
