@@ -5,9 +5,12 @@ import { dbOptions } from '../utils/dbOptions';
 import { corsHeaders } from '../utils/corsHeaders';
 
 export const getProductsById = async event => {
+  console.log('Get product by id: ', event.pathParameters);
+  
   const client = new Client(dbOptions);
   await client.connect();
   const productId = event.pathParameters?.productId;
+
   if (!productId) {
     return {
       statusCode: 400,

@@ -5,9 +5,12 @@ import { dbOptions } from '../utils/dbOptions';
 import { corsHeaders } from '../utils/corsHeaders';
 
 export const setProduct = async event => {
+  console.log('Add new product: ', event.body);
+
   const client = new Client(dbOptions);
   await client.connect();
   const { description, price, title, image } = JSON.parse(event.body.replace(/'/g, "''"));
+
   if (!price || !title) {
     return {
       statusCode: 400,
