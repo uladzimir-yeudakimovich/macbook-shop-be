@@ -19,7 +19,7 @@
     "/products": {
       "get": {
         "summary": "Get products",
-        "description": "Get products\n",
+        "description": "Get products",
         "operationId": "getProducts",
         "responses": {
           "200": {
@@ -33,6 +33,31 @@
                   }
                 }
               }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add product",
+        "requestBody": {
+          "description": "Add product",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "$ref": "#/components/schemas/Product"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Results"
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {}
             }
           }
         }
@@ -78,7 +103,6 @@
       "Product": {
         "required": [
           "count",
-          "id",
           "price",
           "title"
         ],
