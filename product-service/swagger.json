@@ -126,6 +126,34 @@
             "description": "Product not found"
           }
         }
+      },
+      "delete": {
+        "summary": "Delete product by Id",
+        "description": "Delete product by Id",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "ID of product",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Results"
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
       }
     }
   },

@@ -19,12 +19,12 @@ test('should return 400 if path parameter empty', async () => {
   const product = await getProductsById({ pathParameters: null });
   expect(product.statusCode).toEqual(400);
   expect(product.headers).toEqual(corsHeaders);
-  expect(product.body).toEqual("{\"message\":\"Bad request, parameter id is required\"}");
+  expect(product.body).toEqual("{\"message\":\"Bad request, id not valid\"}");
 });
 
 test('should return 400 if id parameter empty', async () => {
   const product = await getProductsById({ pathParameters: { productId: null } });
   expect(product.statusCode).toEqual(400);
   expect(product.headers).toEqual(corsHeaders);
-  expect(product.body).toEqual("{\"message\":\"Bad request, parameter id is required\"}");
+  expect(product.body).toEqual("{\"message\":\"Bad request, id not valid\"}");
 });

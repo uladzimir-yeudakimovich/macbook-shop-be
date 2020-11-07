@@ -16,7 +16,7 @@ export const updateProduct = async event => {
     return {
       statusCode: 400,
       headers: corsHeaders,
-      body: JSON.stringify({ message: 'Bad request, id of product is required' })
+      body: JSON.stringify({ message: 'Bad request, id not valid' })
     };
   }
 
