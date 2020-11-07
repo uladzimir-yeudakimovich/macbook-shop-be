@@ -1,4 +1,5 @@
 // import { APIGatewayProxyHandler } from 'aws-lambda';
+import { uuid } from 'uuidv4';
 import 'source-map-support/register';
 import { Client } from 'pg';
 import { dbOptions } from '../utils/dbOptions';
@@ -9,9 +10,9 @@ export const setProduct = async event => {
 
   const client = new Client(dbOptions);
   await client.connect();
-  const { description, price, title, image } = JSON.parse(event.body.replace(/'/g, "''"));
+  const { description, price, title, image, count } = JSON.parse(event.body.replace(/'/g, "''"));
 
-  if (!price || !title) {
+  if (!description || !price || !title || !count) {
     return {
       statusCode: 400,
       headers: corsHeaders,
@@ -19,14 +20,22 @@ export const setProduct = async event => {
     };
   }
   try {
+    const id = uuid();
+    // add product to products
     await client.query(`
-      INSERT INTO products (description, price, title, image)
-      VALUES ('${description}', '${price}', '${title}', '${image}')
+      INSERT INTO products (id, description, price, title, image)
+      VALUES ('${id}', '${description}', '${price}', '${title}', '${image}')
     `);
+    // add count to stocks
+    await client.query(`
+      INSERT INTO stocks (product_id, count)
+      VALUES ('${id}', '${count}')
+    `);
+    
     return {
       statusCode: 204,
       headers: corsHeaders,
-      body: JSON.stringify({ message: 'Product added' })
+      body: JSON.stringify({ id, description, price, title, image, count })
     };
   } catch (error) {
     console.log(error);
