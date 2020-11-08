@@ -21,12 +21,15 @@ export const updateProduct = async event => {
   }
 
   try {
+    await client.query('BEGIN');
     const { rows: findProduct } = await client.query(`
       SELECT * FROM products p
       WHERE p.id = '${id}'
     `);
+    await client.query('COMMIT');
 
     if (findProduct.length) {
+      await client.query('BEGIN');
       await client.query(`
         UPDATE products
         SET description = '${description}', price = '${price}', title = '${title}', image = '${image}'
@@ -37,6 +40,7 @@ export const updateProduct = async event => {
         SET count = '${count}'
         WHERE product_id = '${id}';
       `);
+      await client.query('COMMIT');
     
       return {
         statusCode: 200,
@@ -52,6 +56,7 @@ export const updateProduct = async event => {
     };
   } catch (error) {
     console.log(error);
+    await client.query('ROLLBACK');
     return {
       statusCode: 500,
       headers: corsHeaders,

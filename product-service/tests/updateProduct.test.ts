@@ -3,7 +3,7 @@ import { updateProduct } from '../handlers/updateProduct';
 import { corsHeaders } from '../utils/corsHeaders';
 
 const TEST_PRODUCT = {
-  id: "dd148310-6573-42c8-910c-4452eca471d8",
+  id: "9e54aa58-5edd-45a4-8da7-98c9e77b6c3d",
   description: "15 2019 TouchBar - 1.4GHz i5 - 8GB RAM - 128GB SSD (Renewed)",
   price: 1340,
   title: "Apple MacBook Pro",

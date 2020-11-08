@@ -21,12 +21,15 @@ export const deleteProduct = async event => {
   }
 
   try {
+    await client.query('BEGIN');
     await client.query(`
       DELETE FROM stocks WHERE product_id = '${productId}'
     `);
     await client.query(`
       DELETE FROM products WHERE id = '${productId}'
     `);
+    await client.query('COMMIT');
+
     return {
       statusCode: 200,
       headers: corsHeaders,
@@ -34,6 +37,7 @@ export const deleteProduct = async event => {
     };
   } catch (error) {
     console.log(error);
+    await client.query('ROLLBACK');
     return {
       statusCode: 500,
       headers: corsHeaders,

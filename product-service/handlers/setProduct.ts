@@ -19,8 +19,11 @@ export const setProduct = async event => {
       body: JSON.stringify({ message: 'Bad request, parameters of product is required' })
     };
   }
+
   try {
     const id = uuid();
+    
+    await client.query('BEGIN');
     // add product to products
     await client.query(`
       INSERT INTO products (id, description, price, title, image)
@@ -31,6 +34,7 @@ export const setProduct = async event => {
       INSERT INTO stocks (product_id, count)
       VALUES ('${id}', '${count}')
     `);
+    await client.query('COMMIT');
     
     return {
       statusCode: 204,
@@ -39,6 +43,7 @@ export const setProduct = async event => {
     };
   } catch (error) {
     console.log(error);
+    await client.query('ROLLBACK');
     return {
       statusCode: 500,
       headers: corsHeaders,

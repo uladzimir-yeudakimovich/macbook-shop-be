@@ -20,13 +20,16 @@ export const getProductsById = async event => {
     };
   }
   
-  try {  
+  try {
+    await client.query('BEGIN');
     const { rows: product } = await client.query(`
       SELECT s.count, p.description, p.id, p.price, p.title, p.image
       FROM products p
       LEFT JOIN stocks s ON p.id = s.product_id
       WHERE p.id = '${productId}'
     `);
+    await client.query('COMMIT');
+
     return {
       statusCode: product.length ? 200 : 404,
       headers: corsHeaders,
@@ -34,6 +37,7 @@ export const getProductsById = async event => {
     };
   } catch (error) {
     console.log(error);
+    await client.query('ROLLBACK');
     return {
       statusCode: 500,
       headers: corsHeaders,
