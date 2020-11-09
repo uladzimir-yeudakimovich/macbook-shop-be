@@ -1,0 +1,11 @@
+service: import-service
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: eu-west-1
+
+functions:
+  hello:
+    handler: handler.hello
