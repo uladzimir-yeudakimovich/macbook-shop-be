@@ -1,5 +1,5 @@
 import { getProductsList } from '../handlers/getProductsList';
-import { corsHeaders } from '../utils/corsHeaders';
+import { corsHeaders } from '../../utils/corsHeaders';
 
 test("should return products list", async () => {
   const products = await getProductsList();

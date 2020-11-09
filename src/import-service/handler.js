@@ -1,18 +1,31 @@
-'use strict';
+import { corsHeaders } from '../../utils/corsHeaders';
+import AWS from 'aws-sdk';
 
-module.exports.hello = async event => {
-  return {
-    statusCode: 200,
+const BUSKET = 'macbook-shop-uploaded';
+
+export const importProductsFile = async event => {
+  const s3 = new AWS.S3();
+  let status = 200;
+  let importProducts = [];
+  const params = {
+    Busket: BUSKET,
+    Prefix: 'import/'
+  }
+  
+  try {
+    const s3Response = await s3.listObjectsV2(params).promise();
+    importProducts = s3Response.Contents;
+  } catch (error) {
+    console.error(error);
+  }
+
+  return response = {
+    statusCode: status,
+    headers: corsHeaders,
     body: JSON.stringify(
-      {
-        message: 'Go Serverless v1.0! Your function executed successfully!',
-        input: event,
-      },
-      null,
-      2
-    ),
-  };
-
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+      importProducts
+        .filter(importProduct => importProduct.Size)
+        .map(importProduct => `https://${BUSKET}.s3.amazonaws.com/${importProduct.key}`)
+    )
+  }
 };

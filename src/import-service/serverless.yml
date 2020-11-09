@@ -7,5 +7,7 @@ provider:
   region: eu-west-1
 
 functions:
-  hello:
-    handler: handler.hello
+  importProductsFile:
+    handler: handler.importProductsFile
+    events:
+      - http: GET importProducts

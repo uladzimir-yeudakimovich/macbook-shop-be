@@ -2,8 +2,8 @@
 import { uuid } from 'uuidv4';
 import 'source-map-support/register';
 import { Client } from 'pg';
-import { dbOptions } from '../utils/dbOptions';
-import { corsHeaders } from '../utils/corsHeaders';
+import { dbOptions } from '../../utils/dbOptions';
+import { corsHeaders } from '../../utils/corsHeaders';
 
 export const setProduct = async event => {
   console.log('Add new product: ', event.body);
