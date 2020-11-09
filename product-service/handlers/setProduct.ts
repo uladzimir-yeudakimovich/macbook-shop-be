@@ -12,7 +12,12 @@ export const setProduct = async event => {
   await client.connect();
   const { description, price, title, image, count } = JSON.parse(event.body.replace(/'/g, "''"));
 
-  if (!description || !price || !title || !count) {
+  if (
+    typeof description !== 'string' ||
+    typeof price !== 'number' ||
+    typeof title !== 'string' ||
+    typeof count !== 'number'
+  ) {
     return {
       statusCode: 400,
       headers: corsHeaders,
@@ -24,12 +29,10 @@ export const setProduct = async event => {
     const id = uuid();
     
     await client.query('BEGIN');
-    // add product to products
     await client.query(`
       INSERT INTO products (id, description, price, title, image)
       VALUES ('${id}', '${description}', '${price}', '${title}', '${image}')
     `);
-    // add count to stocks
     await client.query(`
       INSERT INTO stocks (product_id, count)
       VALUES ('${id}', '${count}')

@@ -3,7 +3,7 @@ import { updateProduct } from '../handlers/updateProduct';
 import { corsHeaders } from '../utils/corsHeaders';
 
 const TEST_PRODUCT = {
-  id: "9e54aa58-5edd-45a4-8da7-98c9e77b6c3d",
+  id: "1031b426-b7fb-48d7-9844-928c3616dde0",
   description: "15 2019 TouchBar - 1.4GHz i5 - 8GB RAM - 128GB SSD (Renewed)",
   price: 1340,
   title: "Apple MacBook Pro",
@@ -28,7 +28,7 @@ test('should return 400 if path parameter unvalid', async () => {
   const product = await updateProduct({ body: JSON.stringify({ ...TEST_PRODUCT, id: '847234793748728947' }) });
   expect(product.statusCode).toEqual(400);
   expect(product.headers).toEqual(corsHeaders);
-  expect(product.body).toEqual("{\"message\":\"Bad request, id not valid\"}");
+  expect(product.body).toEqual("{\"message\":\"Bad request, parameters of product are not valid\"}");
 });
 
 test('should return 404 if product not found', async () => {

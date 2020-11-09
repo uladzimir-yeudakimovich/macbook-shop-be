@@ -11,14 +11,12 @@ export const getProductsList = async () => {
   await client.connect();
 
   try {
-    await client.query('BEGIN');
     const { rows: productList } = await client.query(`
       SELECT s.count, p.description, p.id, p.price, p.title, p.image
       FROM products p
       LEFT JOIN stocks s ON p.id = s.product_id
       WHERE count > 0
     `);
-    await client.query('COMMIT');
 
     return {
       statusCode: 200,
@@ -27,7 +25,6 @@ export const getProductsList = async () => {
     };
   } catch (error) {
     console.log(error);
-    await client.query('ROLLBACK');
     return {
       statusCode: 500,
       headers: corsHeaders,

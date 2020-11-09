@@ -12,21 +12,25 @@ export const updateProduct = async event => {
   const { id, description, price, title, image, count } = JSON.parse(event.body.replace(/'/g, "''"));
   const validation = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
   
-  if (!validation.test(id)) {
+  if (
+    !validation.test(id) ||
+    typeof description !== 'string' ||
+    typeof price !== 'number' ||
+    typeof title !== 'string' ||
+    typeof count !== 'number'
+  ) {
     return {
       statusCode: 400,
       headers: corsHeaders,
-      body: JSON.stringify({ message: 'Bad request, id not valid' })
+      body: JSON.stringify({ message: 'Bad request, parameters of product are not valid' })
     };
   }
 
   try {
-    await client.query('BEGIN');
     const { rows: findProduct } = await client.query(`
       SELECT * FROM products p
       WHERE p.id = '${id}'
     `);
-    await client.query('COMMIT');
 
     if (findProduct.length) {
       await client.query('BEGIN');
