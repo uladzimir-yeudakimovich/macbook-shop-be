@@ -9,15 +9,22 @@ test('should return product', async () => {
 });
 
 test('should return 404 if product not found', async () => {
-  const product = await getProductsById({ pathParameters: { productId: 'c48a80aa' }});
+  const product = await getProductsById({ pathParameters: { productId: '8467ec4b-b10c-48c5-9345-fc73c48a80aa' } });
   expect(product.statusCode).toEqual(404);
   expect(product.headers).toEqual(corsHeaders);
   expect(product.body).toEqual("{\"message\":\"Product not found\"}");
 });
 
-test('should return error if path parameter empty', async () => {
-  const product = await getProductsById({});
-  expect(product.statusCode).toEqual(500);
+test('should return 400 if path parameter empty', async () => {
+  const product = await getProductsById({ pathParameters: null });
+  expect(product.statusCode).toEqual(400);
   expect(product.headers).toEqual(corsHeaders);
-  expect(product.body).toEqual("{\"message\":\"Error while reading data\"}");
+  expect(product.body).toEqual("{\"message\":\"Bad request, id not valid\"}");
+});
+
+test('should return 400 if id parameter empty', async () => {
+  const product = await getProductsById({ pathParameters: { productId: null } });
+  expect(product.statusCode).toEqual(400);
+  expect(product.headers).toEqual(corsHeaders);
+  expect(product.body).toEqual("{\"message\":\"Bad request, id not valid\"}");
 });

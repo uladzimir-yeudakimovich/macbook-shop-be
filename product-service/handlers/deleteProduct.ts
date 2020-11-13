@@ -4,14 +4,14 @@ import { Client } from 'pg';
 import { dbOptions } from '../utils/dbOptions';
 import { corsHeaders } from '../utils/corsHeaders';
 
-export const getProductsById = async event => {
-  console.log('Get product by id: ', event.pathParameters);
-  
+export const deleteProduct = async event => {
+  console.log('Delete product: ', event.pathParameters);
+
   const client = new Client(dbOptions);
   await client.connect();
   const productId = event.pathParameters?.productId;
   const validation = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-
+  
   if (!validation.test(productId)) {
     return {
       statusCode: 400,
@@ -19,22 +19,25 @@ export const getProductsById = async event => {
       body: JSON.stringify({ message: 'Bad request, id not valid' })
     };
   }
-  
+
   try {
-    const { rows: product } = await client.query(`
-      SELECT s.count, p.description, p.id, p.price, p.title, p.image
-      FROM products p
-      LEFT JOIN stocks s ON p.id = s.product_id
-      WHERE p.id = '${productId}'
+    await client.query('BEGIN');
+    await client.query(`
+      DELETE FROM stocks WHERE product_id = '${productId}'
     `);
+    await client.query(`
+      DELETE FROM products WHERE id = '${productId}'
+    `);
+    await client.query('COMMIT');
 
     return {
-      statusCode: product.length ? 200 : 404,
+      statusCode: 200,
       headers: corsHeaders,
-      body: JSON.stringify(product.length ? product[0] : { message: 'Product not found' })
+      body: JSON.stringify({ message: 'Product deleted' })
     };
   } catch (error) {
     console.log(error);
+    await client.query('ROLLBACK');
     return {
       statusCode: 500,
       headers: corsHeaders,
