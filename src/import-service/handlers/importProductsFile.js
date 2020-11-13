@@ -4,30 +4,30 @@ import { corsHeaders } from '../../utils/corsHeaders';
 const BUSKET = 'macbook-shop-uploaded';
 
 export const importProductsFile = async event => {
-  console.log('importProductsFile ', event);
-  const s3 = new AWS.S3();
-  let status = 200;
-  let trumbnails = [];
+  console.log('uploadProductsFile ', event);
+  const catalogName = event.queryStringParameters.fileName;
+  const catalogPath = `uploaded/${catalogName}`;
+
+  const s3 = new AWS.S3({ region: 'eu-west-1' });
   const params = {
     Busket: BUSKET,
-    Prefix: 'uploaded/',
-  }
-  
-  try {
-    const s3Response = await s3.listObjectsV2(params).promise();
-    trumbnails = s3Response.Contents;
-  } catch (error) {
-    console.error(error);
-    status = 500;
+    Key: catalogPath,
+    Expires: 60,
+    ContentType: 'text/csv'
   }
 
-  return {
-    statusCode: status,
-    headers: corsHeaders,
-    body: JSON.stringify(
-      trumbnails
-        .filter(trumbnail => trumbnail.Size)
-        .map(trumbnail => `https://${BUSKET}.s3.amazonaws.com/${trumbnail.key}`)
-    )
-  }
+  return new Promise((resolve, reject) => {
+    s3.getSignedUrl('putObject', params, (error, url) => {
+      if (error) {
+        return reject(error);
+      }
+      console.log(url);
+
+      resolve({
+        statusCode: 200,
+        headers: corsHeaders,
+        body: url
+      });
+    })
+  });
 };

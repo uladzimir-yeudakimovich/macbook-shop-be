@@ -1,41 +1,30 @@
 import AWS from 'aws-sdk';
+import { corsHeaders } from '../../utils/corsHeaders';
 
 const BUSKET = 'macbook-shop-uploaded';
-const catalogPath = 'uploaded/catalog.csv';
 
 export const uploadProductsFile = async event => {
-  console.log('uploadProductsFile ', event);
-  // const s3 = new AWS.S3({ region: 'eu-west-1' });
-  // const params = {
-  //   Busket: BUSKET,
-  //   Key: catalogPath,
-  //   Expires: 60,
-  //   ContentType: 'text/csv'
-  // }
-
-  // s3.getSignedUrl('putObject', params, (error, url) => {
-  //   console.log(url);
-  // })
-
-  const s3 = new AWS.S3();
-
-  for (const record of event.Records) {
-    console.log(record);
-    await s3.copyObject({
-      Busket: BUSKET,
-      CopySource: BUSKET + '/' + record.s3.object.key,
-      Key: record.s3.object.key.replace('images', 'uploaded')
-    }).promise();
-
-    await s3.deleteObject({
-      Busket: BUSKET,
-      Key: record.s3.object.key
-    }).promise();
-
-    console.log('Trumbnail for an image ' + record.s3.object.key.splite('/')[1] + ' is created');
+  console.log('importProductsFile ', event);
+  const s3 = new AWS.S3({ region: 'eu-west-1' });
+  let status = 200;
+  let catalogs;
+  const params = {
+    Busket: BUSKET,
+    Prefix: 'uploaded/',
+    Delimiter: '/'
+  }
+  
+  try {
+    catalogs = await s3.listObjects(params).promise();
+  } catch (error) {
+    console.error(error);
+    catalogs = { message: error };
+    status = 500;
   }
 
   return {
-    statusCode: 202
+    statusCode: status,
+    headers: corsHeaders,
+    body: JSON.stringify(catalogs.Contents.map(catalog => catalog.key.replace(catalog.Prefix, '')))
   }
 };

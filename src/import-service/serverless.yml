@@ -6,29 +6,40 @@ provider:
   runtime: nodejs12.x
   stage: dev
   region: eu-west-1
-  
+
   iamRoleStatements:
     - Effect: 'Allow'
-      Action:
-        - 's3:ListBucket'
+      Action: 's3:ListBucket'
       Resource:
-        - "arn:aws:s3:::macbook-shop-uploaded"
+        - 'arn:aws:s3:::macbook-shop-uploaded'
     - Effect: 'Allow'
       Action:
         - 's3:*'
       Resource:
         - 'arn:aws:s3:::macbook-shop-uploaded/*'
 
+package:
+  exlude:
+    - package-lock.json
+
 functions:
   importProductsFile:
     handler: handler.importProductsFile
     events:
       - http: GET import
+        request:
+          parameters:
+            querystrings:
+              fileName: true
   uploadProductsFile:
     handler: handler.uploadProductsFile
     events:
+      - http: GET uploaded
+  parseProductsFile:
+    handler: handler.parseProductsFile
+    events:
       - s3:
-          busket: macbook-shop-uploaded
+          bucket: macbook-shop-uploaded
           event: s3:ObjectCreated:*
           rules:
             - prefix: uploaded/
