@@ -1,16 +1,13 @@
 import AWS from 'aws-sdk';
-
-const BUCKET = 'macbook-shop-uploaded';
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*"
-};
+import { corsHeaders } from '../utils/corsHeaders';
+import { BUCKET } from '../utils/constants';
 
 export const importProductsFile = async event => {
-  console.log('uploadProductsFile ', event);
+  console.log('importProductsFile ', event);
   const fileName = event.queryStringParameters.name;
   const filePath = `uploaded/${fileName}`;
 
-  const s3 = new AWS.S3({ region: 'eu-west-1' });
+  const s3 = new AWS.S3({ signatureVersion: 'v4' });
   const params = {
     Bucket: BUCKET,
     Key: filePath,

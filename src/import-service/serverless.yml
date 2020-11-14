@@ -30,12 +30,8 @@ functions:
           parameters:
             querystrings:
               fileName: true
-  uploadProductsFile:
-    handler: handler.uploadProductsFile
-    events:
-      - http: GET uploaded
-  parseProductsFile:
-    handler: handler.parseProductsFile
+  importFileParser:
+    handler: handler.importFileParser
     events:
       - s3:
           bucket: macbook-shop-uploaded

@@ -1,5 +1,4 @@
 import { importProductsFile } from './handlers/importProductsFile';
-import { uploadProductsFile } from './handlers/uploadProductsFile';
-import { parseProductsFile } from './handlers/parseProductsFile';
+import { importFileParser } from './handlers/importFileParser';
 
-export { importProductsFile, uploadProductsFile, parseProductsFile };
+export { importProductsFile, importFileParser };
