@@ -1,6 +1,6 @@
 import { setProduct } from '../handlers/setProduct';
 import { updateProduct } from '../handlers/updateProduct';
-import { corsHeaders } from '../../utils/corsHeaders';
+import { corsHeaders } from '../utils/corsHeaders';
 
 const TEST_PRODUCT = {
   id: "1031b426-b7fb-48d7-9844-928c3616dde0",

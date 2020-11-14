@@ -1,5 +1,5 @@
 import { getProductsById } from '../handlers/getProductsById';
-import { corsHeaders } from '../../utils/corsHeaders';
+import { corsHeaders } from '../utils/corsHeaders';
 
 test('should return product', async () => {
   const product = await getProductsById({ pathParameters: { productId: '7567ec4b-b10c-48c5-9345-fc73c48a80aa' }});

@@ -2,7 +2,7 @@
 import 'source-map-support/register';
 import { Client } from 'pg';
 import { dbOptions } from '../dbOptions';
-import { corsHeaders } from '../../utils/corsHeaders';
+import { corsHeaders } from '../utils/corsHeaders';
 
 export const getProductsById = async event => {
   console.log('Get product by id: ', event.pathParameters);

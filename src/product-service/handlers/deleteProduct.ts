@@ -2,7 +2,7 @@
 import 'source-map-support/register';
 import { Client } from 'pg';
 import { dbOptions } from '../dbOptions';
-import { corsHeaders } from '../../utils/corsHeaders';
+import { corsHeaders } from '../utils/corsHeaders';
 
 export const deleteProduct = async event => {
   console.log('Delete product: ', event.pathParameters);

@@ -1,7 +1,9 @@
 import AWS from 'aws-sdk';
-import { corsHeaders } from '../../utils/corsHeaders';
 
-const BUSKET = 'macbook-shop-uploaded';
+const BUCKET = 'macbook-shop-uploaded';
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*"
+};
 
 export const uploadProductsFile = async event => {
   console.log('importProductsFile ', event);
@@ -9,7 +11,7 @@ export const uploadProductsFile = async event => {
   let status = 200;
   let catalogs;
   const params = {
-    Busket: BUSKET,
+    Bucket: BUCKET,
     Prefix: 'uploaded/',
     Delimiter: '/'
   }

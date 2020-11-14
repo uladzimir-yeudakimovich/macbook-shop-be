@@ -1,5 +1,5 @@
 import { setProduct } from '../handlers/setProduct';
-import { corsHeaders } from '../../utils/corsHeaders';
+import { corsHeaders } from '../utils/corsHeaders';
 
 const TEST_PRODUCT = {
   description: "15 2019 TouchBar - 1.4GHz i5 - 8GB RAM - 128GB SSD (Renewed)",

@@ -1,12 +1,15 @@
 service: import-service
 frameworkVersion: '2'
 
+plugins:
+  - serverless-webpack
+  - serverless-jest-plugin
+
 provider:
   name: aws
   runtime: nodejs12.x
   stage: dev
   region: eu-west-1
-
   iamRoleStatements:
     - Effect: 'Allow'
       Action: 's3:ListBucket'
@@ -17,10 +20,6 @@ provider:
         - 's3:*'
       Resource:
         - 'arn:aws:s3:::macbook-shop-uploaded/*'
-
-package:
-  exlude:
-    - package-lock.json
 
 functions:
   importProductsFile:
