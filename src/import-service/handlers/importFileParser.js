@@ -3,15 +3,17 @@ import * as csv from 'csv-parser';
 import { corsHeaders } from '../utils/corsHeaders';
 import { BUCKET } from '../utils/constants';
 
-export const importFileParser = async event => {
+export const importFileParser = event => {
   console.log('importFileParser ', event);
   const s3 = new AWS.S3();
   
-  await event.Records.forEach(record => {
+  event.Records.forEach(record => {
     const s3Stream = s3.getObject({
       Bucket: BUCKET,
       Key: record.s3.object.key
     }).createReadStream();
+
+    console.log('stream: ', s3Stream);
 
     s3Stream.pipe(csv())
       .on('data', data => console.log('data: ', data))
@@ -36,26 +38,8 @@ export const importFileParser = async event => {
       })
   })
 
-  let files;
-
-  try {
-    files = await s3.listObjects({
-      Bucket: BUCKET,
-      Prefix: 'parsed/',
-      Delimiter: '/'
-    }).promise();
-  } catch (error) {
-    console.error(error);
-    return {
-      statusCode: 500,
-      headers: corsHeaders,
-      body: JSON.stringify({ message: 'Error while reading data' })
-    }
-  }
-
   return {
     statusCode: 200,
-    headers: corsHeaders,
-    body: JSON.stringify(files.Contents.map(file => file.key ? file.key.replace(files.Prefix, '') : ''))
+    headers: corsHeaders
   }
 }
