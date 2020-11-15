@@ -6,6 +6,14 @@ export const importProductsFile = async event => {
   console.log('importProductsFile: ', event);
   const { name } = event.queryStringParameters;
   const filePath = `uploaded/${name}`;
+  
+  if (typeof name !== 'string') {
+    return {
+      statusCode: 400,
+      headers: corsHeaders,
+      body: JSON.stringify({ message: 'Bad request, parameter name is required' })
+    };
+  }
 
   const s3 = new AWS.S3({ signatureVersion: 'v4' });
   const params = {

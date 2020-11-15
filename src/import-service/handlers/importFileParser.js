@@ -13,8 +13,6 @@ export const importFileParser = event => {
       Key: record.s3.object.key
     }).createReadStream();
 
-    console.log('stream: ', s3Stream);
-
     s3Stream.pipe(csv())
       .on('data', data => console.log('data: ', data))
       .on('error', error => console.error('error: ', error))
