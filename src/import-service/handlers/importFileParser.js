@@ -7,7 +7,7 @@ export const importFileParser = async event => {
   console.log('importFileParser ', event);
   const s3 = new AWS.S3();
   
-  event.Records.forEach(record => {
+  await event.Records.forEach(record => {
     const s3Stream = s3.getObject({
       Bucket: BUCKET,
       Key: record.s3.object.key
@@ -26,6 +26,13 @@ export const importFileParser = async event => {
         }).promise();
         
         console.log(`Copy into ${BUCKET}/${record.s3.object.key.replace('uploaded', 'parsed')}`);
+
+        await s3.deleteObject({
+          Bucket: BUCKET,
+          Key: record.s3.object.key
+        }).promise();
+        
+        console.log(`Delete from ${BUCKET}/${record.s3.object.key}`);
       })
   })
 
@@ -49,6 +56,6 @@ export const importFileParser = async event => {
   return {
     statusCode: 200,
     headers: corsHeaders,
-    body: JSON.stringify(files.Contents.map(file => file.key))
+    body: JSON.stringify(files.Contents.map(file => file.key ? file.key.replace(files.Prefix, '') : ''))
   }
 }
