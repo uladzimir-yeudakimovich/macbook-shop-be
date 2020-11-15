@@ -6,26 +6,30 @@ import { BUCKET } from '../utils/constants';
 export const importFileParser = async event => {
   console.log('importFileParser ', event);
   const s3 = new AWS.S3();
-  let status = 200;
-  const params = {
-    Bucket: BUCKET,
-    Prefix: 'uploaded/',
-    Delimiter: '/'
-  }
   let files;
 
   try {
-    files = await s3.listObjects(params).promise();
+    files = await s3.listObjects({
+      Bucket: BUCKET,
+      Prefix: 'uploaded/',
+      Delimiter: '/'
+    }).promise();
   } catch (error) {
     console.error(error);
-    status = 500;
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ message: 'Error while reading data' })
+    }
   }
   
   event.Records.forEach(record => {
     const s3Stream = s3.getObject({
       Bucket: BUCKET,
-      CopySource: record.s3.object.key
+      Key: record.s3.object.key
     }).createReadStream();
+
+    console.log('stream ', s3Stream);
 
     s3Stream.pipe(csv())
       .on('data', data => console.log(data))
@@ -43,7 +47,7 @@ export const importFileParser = async event => {
   })
 
   return {
-    statusCode: status,
+    statusCode: 200,
     headers: corsHeaders,
     body: JSON.stringify(files.Contents.map(file => file.key.replace(file.Prefix, '')))
   }

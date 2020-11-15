@@ -5,6 +5,12 @@ plugins:
   - serverless-webpack
   - serverless-jest-plugin
 
+custom:
+  webpack:
+    includeModules:
+      forceExclude:
+        - aws-sdk
+
 provider:
   name: aws
   runtime: nodejs12.x
@@ -29,7 +35,7 @@ functions:
         request:
           parameters:
             querystrings:
-              fileName: true
+              name: true
   importFileParser:
     handler: handler.importFileParser
     events:
