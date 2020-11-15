@@ -3,9 +3,9 @@ import { corsHeaders } from '../utils/corsHeaders';
 import { BUCKET } from '../utils/constants';
 
 export const importProductsFile = async event => {
-  console.log('importProductsFile ', event);
-  const fileName = event.queryStringParameters.name;
-  const filePath = `uploaded/${fileName}`;
+  console.log('importProductsFile: ', event);
+  const { name } = event.queryStringParameters;
+  const filePath = `uploaded/${name}`;
 
   const s3 = new AWS.S3({ signatureVersion: 'v4' });
   const params = {
@@ -20,7 +20,7 @@ export const importProductsFile = async event => {
   return new Promise((resolve, reject) => {
     s3.getSignedUrl('putObject', params, (error, url) => {
       if (error) {
-        console.log(error);
+        console.error('error: ', error);
         return reject(error);
       }
       console.log(url);

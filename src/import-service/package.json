@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
+    "aws-sdk": "^2.792.0",
     "csv-parser": "^2.3.3"
   },
   "exports": "./handler.js",
@@ -13,7 +14,6 @@
   "devDependencies": {
     "@babel/core": "^7.12.3",
     "@babel/preset-env": "^7.12.1",
-    "aws-sdk": "^2.792.0",
     "babel-jest": "^26.6.1",
     "babel-loader": "^8.1.0",
     "babel-plugin-transform-runtime": "^6.23.0",
