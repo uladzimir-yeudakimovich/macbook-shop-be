@@ -4,7 +4,7 @@ import { corsHeaders } from '../utils/corsHeaders';
 import { BUCKET } from '../utils/constants';
 
 export const importFileParser = event => {
-  
+
   console.log('importFileParser: ', event);
 
   try {
@@ -41,7 +41,10 @@ export const importFileParser = event => {
           sqs.sendMessage({
             QueueUrl: process.env.SQS_URL,
             MessageBody: record.s3.object.key
-          }, () => console.log('Send message for: ', record.s3.object.key));
+          }, (err, data) => {
+            if (err) console.log(err, err.stack);
+            else     console.log('Send message for: ', data);
+          });
         })
   
       return {

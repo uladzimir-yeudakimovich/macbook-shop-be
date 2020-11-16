@@ -2,7 +2,6 @@ import AWS from 'aws-sdk';
 
 export const catalogBatchProcess = event => {
   console.log('catalogBatchProcess: ', event);
-  console.log('length: ', event.Records.length);
 
   const messages = event.Records.map(({ body }) => body);
   console.log('messages: ', messages);
@@ -12,5 +11,8 @@ export const catalogBatchProcess = event => {
     Subject: 'New products',
     Message: JSON.stringify(messages),
     TopicArn: process.env.SNS_ARN
-  }, () => console.log('Send email for: ', JSON.stringify(messages)));
+  }, (err, data) => {
+    if (err) console.log(err, err.stack);
+    else     console.log('Send email for: ', data);
+  });
 }
