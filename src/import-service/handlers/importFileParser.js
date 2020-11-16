@@ -3,9 +3,10 @@ import * as csv from 'csv-parser';
 import { corsHeaders } from '../utils/corsHeaders';
 import { BUCKET } from '../utils/constants';
 
-export const importFileParser = event => {
-  console.log('importFileParser ', event);
+export const importFileParser = (event, callback) => {
+  console.log('importFileParser: ', event);
   const s3 = new AWS.S3();
+  const sqs = AWS.SQS();
   
   event.Records.forEach(record => {
     const s3Stream = s3.getObject({
@@ -33,11 +34,16 @@ export const importFileParser = event => {
         }).promise();
         
         console.log(`Delete from ${BUCKET}/${record.s3.object.key}`);
-      })
-  })
 
-  return {
-    statusCode: 200,
-    headers: corsHeaders
-  }
+        sqs.sendMessage({
+          QueueUrl: process.env.SQS_URL,
+          MessageBody: record
+        }, () => console.log('Send message for: ', record));
+      })
+
+    callback(null, {
+      statusCode: 200,
+      headers: corsHeaders
+    })
+  })
 }

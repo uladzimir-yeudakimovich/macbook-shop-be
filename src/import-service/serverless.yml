@@ -3,13 +3,20 @@ frameworkVersion: '2'
 
 plugins:
   - serverless-webpack
-  - serverless-jest-plugin
+  - serverless-dotenv-plugin
 
 provider:
   name: aws
   runtime: nodejs12.x
   stage: dev
   region: eu-west-1
+
+  enviroment:
+    SQS_URL:
+      Ref: SQSQueue
+    SNS_ARN:
+      Ref: SNSTopic
+
   iamRoleStatements:
     - Effect: 'Allow'
       Action: 's3:ListBucket'
@@ -20,6 +27,33 @@ provider:
         - 's3:*'
       Resource:
         - 'arn:aws:s3:::macbook-shop-uploaded/*'
+    - Effect: 'Allow'
+      Action:
+        - 'sqs:*'
+      Resource:
+        - Fn::GetAtt: [ SQSQueue, Arn ]
+    - Effect: 'Allow'
+      Action:
+        - 'sns:*'
+      Resource:
+        - Ref: SNSTopic
+
+resources:
+  Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+    SNSSubscription:
+      Type: AWS::SNS::Subscription
+      Endpoint: uladzimir.yeudakimovich@gmail.com
+      Protocol: email
+      TopicArn:
+        Ref: SNSTopic
 
 functions:
   importProductsFile:
@@ -39,3 +73,12 @@ functions:
           rules:
             - prefix: uploaded/
           existing: true
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt:
+              - SQSQueue
+              - Arn
