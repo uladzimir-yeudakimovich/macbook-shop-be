@@ -9,7 +9,7 @@ export const catalogBatchProcess = event => {
 
   const sns = new AWS.SNS();
   sns.publish({
-    Subject: 'New product',
+    Subject: 'New products',
     Message: JSON.stringify(messages),
     TopicArn: process.env.SNS_ARN
   }, () => console.log('Send email for: ', JSON.stringify(messages)));
