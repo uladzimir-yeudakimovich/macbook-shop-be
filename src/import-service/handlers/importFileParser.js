@@ -3,10 +3,10 @@ import * as csv from 'csv-parser';
 import { corsHeaders } from '../utils/corsHeaders';
 import { BUCKET } from '../utils/constants';
 
-export const importFileParser = (event, callback) => {
+export const importFileParser = event => {
   console.log('importFileParser: ', event);
   const s3 = new AWS.S3();
-  const sqs = AWS.SQS();
+  const sqs = new AWS.SQS();
   
   event.Records.forEach(record => {
     const s3Stream = s3.getObject({
@@ -38,12 +38,12 @@ export const importFileParser = (event, callback) => {
         sqs.sendMessage({
           QueueUrl: process.env.SQS_URL,
           MessageBody: record
-        }, () => console.log('Send message for: ', record));
+        }, () => console.log('Send message for: ', record.s3.object));
       })
 
-    callback(null, {
+    return {
       statusCode: 200,
       headers: corsHeaders
-    })
+    }
   })
 }

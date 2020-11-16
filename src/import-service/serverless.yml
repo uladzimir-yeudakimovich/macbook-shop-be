@@ -50,10 +50,11 @@ resources:
         TopicName: createProductTopic
     SNSSubscription:
       Type: AWS::SNS::Subscription
-      Endpoint: uladzimir.yeudakimovich@gmail.com
-      Protocol: email
-      TopicArn:
-        Ref: SNSTopic
+      Properties:
+        Endpoint: uladzimir.yeudakimovich@gmail.com
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
 
 functions:
   importProductsFile:

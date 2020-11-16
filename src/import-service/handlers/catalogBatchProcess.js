@@ -7,7 +7,7 @@ export const catalogBatchProcess = event => {
   const messages = event.Records.map(({ body }) => body);
   console.log('messages: ', messages);
 
-  const sns = AWS.SNS();
+  const sns = new AWS.SNS();
   sns.publish({
     Subject: 'New product',
     Message: JSON.stringify(messages),
