@@ -1,6 +1,6 @@
 import type { Serverless } from 'serverless/aws';
 
-const { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD } = process.env;
+const { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD, SNS_ARN } = process.env;
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -19,10 +19,41 @@ const serverlessConfiguration: Serverless = {
     runtime: 'nodejs12.x',
     region: 'eu-west-1',
     stage: 'dev',
+    iamRoleStatements: [
+      {
+        Effect: 'Allow',
+        Action: 'sns:*',
+        Resource: [
+          {
+            Ref: 'SNSTopic'
+          }
+        ],
+      },
+    ],
     apiGateway: {
       minimumCompressionSize: 1024,
     },
-    environment: { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD },
+    environment: { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD, SNS_ARN },
+  },
+  resources: {
+    Resources: {
+      SNSTopic: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+          TopicName: 'createProductTopic'
+        }
+      },
+      SNSSubscription: {
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Endpoint: 'uladzimir.yeudakimovich@gmail.com',
+          Protocol: 'email',
+          TopicArn: {
+            Ref: 'SNSTopic'
+          }
+        }
+      }
+    }
   },
   functions: {
     getProductsList: {
@@ -95,6 +126,17 @@ const serverlessConfiguration: Serverless = {
                 }
               }
             }
+          }
+        }
+      ]
+    },
+    catalogBatchProcess: {
+      handler: 'handler.catalogBatchProcess',
+      events: [
+        {
+          sqs: {
+            batchSize: 5,
+            arn: 'Fn::GetAtt: [ SQSQueue, Arn ]'
           }
         }
       ]
