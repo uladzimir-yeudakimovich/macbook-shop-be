@@ -136,7 +136,7 @@ const serverlessConfiguration: Serverless = {
         {
           sqs: {
             batchSize: 5,
-            arn: 'Fn::GetAtt: [ SQSQueue, Arn ]'
+            arn: '${cf:import-service-${self:provider.stage}.SQSQueueArn}'
           }
         }
       ]

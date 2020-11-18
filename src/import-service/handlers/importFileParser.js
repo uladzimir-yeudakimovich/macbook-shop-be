@@ -40,7 +40,7 @@ export const importFileParser = event => {
   
           sqs.sendMessage({
             QueueUrl: process.env.SQS_URL,
-            MessageBody: record.s3.object.key
+            MessageBody: record.s3.object.key.replace('uploaded', 'parsed')
           }, (err, data) => {
             if (err) console.log(err, err.stack);
             else     console.log('Send message for: ', data);
