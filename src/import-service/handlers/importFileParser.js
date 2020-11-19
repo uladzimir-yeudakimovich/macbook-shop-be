@@ -22,7 +22,10 @@ export const importFileParser = event => {
       s3Stream.pipe(csv({ separator: '\t' }))
         .on('data', data => {
           console.log('data: ', data);
-          products.push(data);
+          const keys = Object.keys(data)[0].split(';');
+          const values = Object.values(data)[0].split(';');
+          const product = Object.assign(...keys.map((n, i) => ({ [n]: values[i] })));
+          products.push(product);
         })
         .on('error', error => console.error('error: ', error))
         .on('end', async () => {
