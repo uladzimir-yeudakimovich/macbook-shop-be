@@ -1,7 +1,7 @@
 // import { APIGatewayProxyHandler } from 'aws-lambda';
 import 'source-map-support/register';
 import { Client } from 'pg';
-import { dbOptions } from '../utils/dbOptions';
+import { dbOptions } from '../dbOptions';
 import { corsHeaders } from '../utils/corsHeaders';
 
 export const deleteProduct = async event => {

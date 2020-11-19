@@ -15,3 +15,5 @@ Launches the test runner in the interactive watch mode.
 ## API:
 
 Link to product-service API [https://6ensb26b5m.execute-api.eu-west-1.amazonaws.com/dev/products/](https://6ensb26b5m.execute-api.eu-west-1.amazonaws.com/dev/products/)
+
+Link to import-service API [https://4i2lncwk5k.execute-api.eu-west-1.amazonaws.com/dev/import/](https://4i2lncwk5k.execute-api.eu-west-1.amazonaws.com/dev/import/)
