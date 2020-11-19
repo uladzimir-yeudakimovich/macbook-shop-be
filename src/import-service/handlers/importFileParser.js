@@ -16,9 +16,14 @@ export const importFileParser = event => {
         Bucket: BUCKET,
         Key: record.s3.object.key
       }).createReadStream();
+
+      const products = [];
   
-      s3Stream.pipe(csv())
-        .on('data', data => console.log('data: ', data))
+      s3Stream.pipe(csv({ separator: '\t' }))
+        .on('data', data => {
+          console.log('data: ', data);
+          products.push(data);
+        })
         .on('error', error => console.error('error: ', error))
         .on('end', async () => {
           console.log(`Copy from ${BUCKET}/${record.s3.object.key}`);
@@ -40,7 +45,7 @@ export const importFileParser = event => {
   
           sqs.sendMessage({
             QueueUrl: process.env.SQS_URL,
-            MessageBody: record.s3.object.key.replace('uploaded', 'parsed')
+            MessageBody: JSON.stringify(products)
           }, (err, data) => {
             if (err) console.log(err, err.stack);
             else     console.log('Send message for: ', data);

@@ -1,9 +1,9 @@
 import AWS from 'aws-sdk';
 
-export const catalogBatchProcess = event => {
+export const catalogBatchProcess = async event => {
   console.log('catalogBatchProcess: ', event);
 
-  const products = event.Records.map(({ body }) => body);
+  const products = event.Records.map(({ body }) => JSON.parse(body));
   console.log('products: ', products);
 
   const sns = new AWS.SNS();
