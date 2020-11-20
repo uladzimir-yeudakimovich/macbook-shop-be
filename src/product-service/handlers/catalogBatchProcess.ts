@@ -7,53 +7,57 @@ import { corsHeaders } from '../utils/corsHeaders';
 export const catalogBatchProcess = async event => {
   console.log('catalogBatchProcess: ', event);
 
-  const products = event.Records.map(({ body }) => JSON.parse(body));
-  console.log('products: ', products);
+  const product = event.Records.map(({ body }) => JSON.parse(body));
+  console.log('products: ', product);
 
-  const id = uuid();
-  const productsForSave = [];
-  const stocksForSave = [];
-
-  products[0].forEach((product, i) => {
-    console.log(`product${i}: `, product[i]);
-    const { description, price, title, image, count } = product;
-
-    productsForSave.push('(', id, description, parseInt(price), title, image, ')');
-    stocksForSave.push(id, parseInt(count));
+  const sns = new AWS.SNS();
+  sns.publish({
+    Subject: 'New products',
+    Message: JSON.stringify(product),
+    TopicArn: process.env.SNS_ARN
+  }, (err, data) => {
+    if (err) console.log(err, err.stack);
+    else     console.log('Send email for: ', data);
   });
 
-  console.log('productsForSave: ', productsForSave);
-  console.log('stocksForSave: ', stocksForSave);
-  
+  const { description, price: priceSt, title, image, count: countSt } = product[0];
+  const price = parseInt(priceSt);
+  const count = parseInt(countSt);
+
+  if (
+    typeof description !== 'string' ||
+    typeof price !== 'number' ||
+    typeof title !== 'string' ||
+    typeof count !== 'number'
+  ) {
+    return {
+      statusCode: 400,
+      headers: corsHeaders,
+      body: JSON.stringify({ message: 'Bad request, parameters of product is required' })
+    };
+  }
+
   const client = new Client(dbOptions);
   await client.connect();
 
   try {
+    const id = uuid();
+    
     await client.query('BEGIN');
     await client.query(`
       INSERT INTO products (id, description, price, title, image)
-      VALUES ${productsForSave}
+      VALUES ('${id}', '${description}', '${price}', '${title}', '${image}')
     `);
     await client.query(`
       INSERT INTO stocks (product_id, count)
-      VALUES ${stocksForSave}
+      VALUES ('${id}', '${count}')
     `);
     await client.query('COMMIT');
-
-    const sns = new AWS.SNS();
-    sns.publish({
-      Subject: 'New products',
-      Message: JSON.stringify(products),
-      TopicArn: process.env.SNS_ARN
-    }, (err, data) => {
-      if (err) console.log(err, err.stack);
-      else     console.log('Send email for: ', data);
-    });
     
     return {
       statusCode: 204,
       headers: corsHeaders,
-      body: JSON.stringify({ message: 'Products saved' })
+      body: JSON.stringify({ id, description, price, title, image, count })
     };
   } catch (error) {
     console.log(error);

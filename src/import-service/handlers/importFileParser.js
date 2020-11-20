@@ -16,8 +16,6 @@ export const importFileParser = event => {
         Bucket: BUCKET,
         Key: record.s3.object.key
       }).createReadStream();
-
-      const products = [];
   
       s3Stream.pipe(csv({ separator: '\t' }))
         .on('data', data => {
@@ -25,7 +23,13 @@ export const importFileParser = event => {
           const keys = Object.keys(data)[0].split(';');
           const values = Object.values(data)[0].split(';');
           const product = Object.assign(...keys.map((n, i) => ({ [n]: values[i] })));
-          products.push(product);
+          sqs.sendMessage({
+            QueueUrl: process.env.SQS_URL,
+            MessageBody: JSON.stringify(product)
+          }, (err, data) => {
+            if (err) console.log(err, err.stack);
+            else     console.log('Send message for: ', data);
+          });
         })
         .on('error', error => console.error('error: ', error))
         .on('end', async () => {
@@ -45,14 +49,6 @@ export const importFileParser = event => {
           }).promise();
           
           console.log(`Delete from ${BUCKET}/${record.s3.object.key}`);
-  
-          sqs.sendMessage({
-            QueueUrl: process.env.SQS_URL,
-            MessageBody: JSON.stringify(products)
-          }, (err, data) => {
-            if (err) console.log(err, err.stack);
-            else     console.log('Send message for: ', data);
-          });
         })
   
       return {
