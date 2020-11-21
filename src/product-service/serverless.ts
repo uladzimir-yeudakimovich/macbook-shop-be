@@ -1,6 +1,17 @@
 import type { Serverless } from 'serverless/aws';
 
-const { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD, SNS_ARN } = process.env;
+const {
+  PG_HOST,
+  PG_PORT,
+  PG_DATABASE,
+  PG_USER,
+  PG_PASSWORD,
+  SNS_ARN_CREATE,
+  SNS_ARN_ERROR,
+  EMAIL_PRODUCTS,
+  EMAIL_ERROR,
+  REGION
+} = process.env;
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -17,7 +28,7 @@ const serverlessConfiguration: Serverless = {
   provider: {
     name: 'aws',
     runtime: 'nodejs12.x',
-    region: 'eu-west-1',
+    region: REGION,
     stage: 'dev',
     iamRoleStatements: [
       {
@@ -26,6 +37,9 @@ const serverlessConfiguration: Serverless = {
         Resource: [
           {
             Ref: 'SNSTopic'
+          },
+          {
+            Ref: 'SNSTopicError'
           }
         ],
       },
@@ -33,7 +47,7 @@ const serverlessConfiguration: Serverless = {
     apiGateway: {
       minimumCompressionSize: 1024,
     },
-    environment: { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD, SNS_ARN },
+    environment: { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD, SNS_ARN_CREATE, SNS_ARN_ERROR },
   },
   resources: {
     Resources: {
@@ -43,13 +57,29 @@ const serverlessConfiguration: Serverless = {
           TopicName: 'createProductTopic'
         }
       },
+      SNSTopicError: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+          TopicName: 'errorProductTopic'
+        }
+      },
       SNSSubscription: {
         Type: 'AWS::SNS::Subscription',
         Properties: {
-          Endpoint: 'uladzimir.yeudakimovich@gmail.com',
+          Endpoint: EMAIL_PRODUCTS,
           Protocol: 'email',
           TopicArn: {
             Ref: 'SNSTopic'
+          }
+        }
+      },
+      SNSSubscriptionError: {
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Endpoint: EMAIL_ERROR,
+          Protocol: 'email',
+          TopicArn: {
+            Ref: 'SNSTopicError'
           }
         }
       }

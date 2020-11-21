@@ -10,16 +10,6 @@ export const catalogBatchProcess = async event => {
   const product = event.Records.map(({ body }) => JSON.parse(body));
   console.log('products: ', product);
 
-  const sns = new AWS.SNS();
-  sns.publish({
-    Subject: 'New products',
-    Message: JSON.stringify(product),
-    TopicArn: process.env.SNS_ARN
-  }, (err, data) => {
-    if (err) console.log(err, err.stack);
-    else     console.log('Send email for: ', data);
-  });
-
   const { description, price: priceSt, title, image, count: countSt } = product[0];
   const price = parseInt(priceSt);
   const count = parseInt(countSt);
@@ -37,6 +27,7 @@ export const catalogBatchProcess = async event => {
     };
   }
 
+  const sns = new AWS.SNS();
   const client = new Client(dbOptions);
   await client.connect();
 
@@ -54,6 +45,15 @@ export const catalogBatchProcess = async event => {
     `);
     await client.query('COMMIT');
     
+    sns.publish({
+      Subject: 'New products',
+      Message: JSON.stringify(product),
+      TopicArn: process.env.SNS_ARN_CREATE
+    }, (err, data) => {
+      if (err) console.log(err, err.stack);
+      else     console.log('Send email for: ', data);
+    });
+    
     return {
       statusCode: 204,
       headers: corsHeaders,
@@ -62,6 +62,16 @@ export const catalogBatchProcess = async event => {
   } catch (error) {
     console.log(error);
     await client.query('ROLLBACK');
+
+    sns.publish({
+      Subject: 'File has problems',
+      Message: JSON.stringify(product),
+      TopicArn: process.env.SNS_ARN_ERROR
+    }, (err, data) => {
+      if (err) console.log(err, err.stack);
+      else     console.log('Send email for: ', data);
+    });
+
     return {
       statusCode: 500,
       headers: corsHeaders,
