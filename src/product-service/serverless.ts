@@ -1,17 +1,6 @@
 import type { Serverless } from 'serverless/aws';
 
-const {
-  PG_HOST,
-  PG_PORT,
-  PG_DATABASE,
-  PG_USER,
-  PG_PASSWORD,
-  SNS_ARN_CREATE,
-  SNS_ARN_ERROR,
-  EMAIL_PRODUCTS,
-  EMAIL_ERROR,
-  REGION
-} = process.env;
+const { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD, SNS_ARN } = process.env;
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -28,7 +17,7 @@ const serverlessConfiguration: Serverless = {
   provider: {
     name: 'aws',
     runtime: 'nodejs12.x',
-    region: REGION,
+    region: 'eu-west-1',
     stage: 'dev',
     iamRoleStatements: [
       {
@@ -37,9 +26,6 @@ const serverlessConfiguration: Serverless = {
         Resource: [
           {
             Ref: 'SNSTopic'
-          },
-          {
-            Ref: 'SNSTopicError'
           }
         ],
       },
@@ -47,7 +33,7 @@ const serverlessConfiguration: Serverless = {
     apiGateway: {
       minimumCompressionSize: 1024,
     },
-    environment: { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD, SNS_ARN_CREATE, SNS_ARN_ERROR },
+    environment: { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD, SNS_ARN },
   },
   resources: {
     Resources: {
@@ -57,29 +43,26 @@ const serverlessConfiguration: Serverless = {
           TopicName: 'createProductTopic'
         }
       },
-      SNSTopicError: {
-        Type: 'AWS::SNS::Topic',
-        Properties: {
-          TopicName: 'errorProductTopic'
-        }
-      },
-      SNSSubscription: {
+      SNSSubscriptionAir: {
         Type: 'AWS::SNS::Subscription',
         Properties: {
-          Endpoint: EMAIL_PRODUCTS,
+          Endpoint: 'uladzimir.yeudakimovich@gmail.com',
           Protocol: 'email',
           TopicArn: {
             Ref: 'SNSTopic'
           }
         }
       },
-      SNSSubscriptionError: {
+      SNSSubscriptionPro: {
         Type: 'AWS::SNS::Subscription',
         Properties: {
-          Endpoint: EMAIL_ERROR,
+          Endpoint: 'berkut2426@gmail.com',
           Protocol: 'email',
           TopicArn: {
-            Ref: 'SNSTopicError'
+            Ref: 'SNSTopic'
+          },
+          FilterPolicy: {
+            title: ['Apple MacBook Pro']
           }
         }
       }
