@@ -35,7 +35,7 @@ export const catalogBatchProcess = async event => {
     MessageAttributes: {
       title: {
         DataType: "String",
-        StringValue: product.title
+        StringValue: product[0].title
       }
     }
   }, (err, data) => {
