@@ -14,14 +14,14 @@ provider:
 functions:
   tokenAuth:
     handler: handler.basicAuthorizer
-    events:
-      - http:
-          path: token
-          method: get
-          cors: true
-          authorizer:
-            name: tokenAuthorizer
-            arn: 'arn:aws:lambda:eu-west-1:714652663732:function:authorization-service-dev-tokenAuth'
-            resultTtlInSeconds: 0
-            identitySource: method.request.header.Authorization
-            type: tokenAuth
+    # events:
+    #   - http:
+    #       path: token
+    #       method: get
+    #       cors: true
+    #       authorizer:
+    #         name: tokenAuthorizer
+    #         arn: 'arn:aws:lambda:eu-west-1:714652663732:function:authorization-service-dev-tokenAuth'
+    #         resultTtlInSeconds: 0
+    #         identitySource: method.request.header.Authorization
+    #         type: tokenAuth

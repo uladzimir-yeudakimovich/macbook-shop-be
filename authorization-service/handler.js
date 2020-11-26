@@ -1,5 +1,5 @@
 export const basicAuthorizer = async (event, ctx, cb) => {
-  console.log('basicAuthorizer: ', event);
+  console.log('basicAuthorizer: ', JSON.stringify(event));
 
   if (event.type !== 'TOKEN') {
     cb('Unauthorized');
@@ -7,7 +7,6 @@ export const basicAuthorizer = async (event, ctx, cb) => {
 
   try {
     const authorizationToken = event.authorizationToken;
-
     const encodedCreds = authorizationToken.split(' ')[1];
     const buff = Buffer.from(encodedCreds, 'base64');
     const plainCreds = buff.toString('utf-8').split(':');
@@ -24,11 +23,11 @@ export const basicAuthorizer = async (event, ctx, cb) => {
     cb(null, policy);
   } catch (error) {
     console.error('error: ', error);
-    cb('Error: Invalid token');
+    cb(`Unauthorized: ${error.message}`);
   }
 }
 
-const generatePolicy = (principalId, resource, effect = 'Allow') => {
+const generatePolicy = (principalId, resource, effect = 'Deny') => {
   return {
     principalId: principalId,
     policyDocument: {

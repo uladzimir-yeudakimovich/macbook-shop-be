@@ -31,36 +31,6 @@ provider:
       Resource:
         - Fn::GetAtt: [ SQSQueue, Arn ]
 
-resources:
-  Resources:
-    SQSQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: catalogItemsQueue
-    GatewayResponseDenied:
-      Type: AWS::ApiGateway::GatewayResponse
-      Properties:
-        ResponseParameters:
-          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-          gatewayresponse.header.Access-Control-Allow-Credentials: 'true'
-        ResponseType: ACCESS_DENIED
-        RestApiId: !Ref ApiGatewayRestApi
-    GatewayResponseUnauthorized:
-      Type: AWS::ApiGateway::GatewayResponse
-      Properties:
-        ResponseParameters:
-          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-          gatewayresponse.header.Access-Control-Allow-Credentials: 'true'
-        ResponseType: UNAUTHORIZED
-        RestApiId: !Ref ApiGatewayRestApi
-  Outputs:
-    SQSQueueUrl:
-      Value:
-        Ref: SQSQueue
-    SQSQueueArn:
-      Value:
-        Fn::GetAtt: [ SQSQueue, Arn ]
-
 functions:
   importProductsFile:
     handler: handler.importProductsFile
@@ -94,3 +64,33 @@ functions:
           rules:
             - prefix: uploaded/
           existing: true
+
+resources:
+  Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+    GatewayResponseDenied:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: ACCESS_DENIED
+        RestApiId: !Ref ApiGatewayRestApi
+    GatewayResponseUnauthorized:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: UNAUTHORIZED
+        RestApiId: !Ref ApiGatewayRestApi
+  Outputs:
+    SQSQueueUrl:
+      Value:
+        Ref: SQSQueue
+    SQSQueueArn:
+      Value:
+        Fn::GetAtt: [ SQSQueue, Arn ]
