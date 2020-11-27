@@ -15,29 +15,38 @@ export const importProductsFile = async event => {
     };
   }
 
-  const s3 = new AWS.S3({ signatureVersion: 'v4' });
-  const params = {
-    Bucket: BUCKET,
-    Key: filePath,
-    Expires: 60,
-    ContentType: 'text/csv'
+  try {
+    const s3 = new AWS.S3({ signatureVersion: 'v4' });
+    const params = {
+      Bucket: BUCKET,
+      Key: filePath,
+      Expires: 60,
+      ContentType: 'text/csv'
+    }
+  
+    console.log(params);
+  
+    return new Promise((resolve, reject) => {
+      s3.getSignedUrl('putObject', params, (error, url) => {
+        if (error) {
+          console.error('error: ', error);
+          return reject(error);
+        }
+        console.log(url);
+  
+        resolve({
+          statusCode: 200,
+          headers: corsHeaders,
+          body: url
+        });
+      })
+    });
+  } catch (error) {
+    console.error('error: ', error);
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ message: 'Error while reading data' })
+    }
   }
-
-  console.log(params);
-
-  return new Promise((resolve, reject) => {
-    s3.getSignedUrl('putObject', params, (error, url) => {
-      if (error) {
-        console.error('error: ', error);
-        return reject(error);
-      }
-      console.log(url);
-
-      resolve({
-        statusCode: 200,
-        headers: corsHeaders,
-        body: url
-      });
-    })
-  });
 };

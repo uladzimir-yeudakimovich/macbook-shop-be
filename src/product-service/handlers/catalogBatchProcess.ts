@@ -1,16 +1,18 @@
-// import { APIGatewayProxyHandler } from 'aws-lambda';
 import { uuid } from 'uuidv4';
-import 'source-map-support/register';
+import AWS from 'aws-sdk';
 import { Client } from 'pg';
 import { dbOptions } from '../utils/dbOptions';
 import { corsHeaders } from '../utils/corsHeaders';
 
-export const setProduct = async event => {
-  console.log('Add new product: ', event.body);
+export const catalogBatchProcess = async event => {
+  console.log('catalogBatchProcess: ', event);
 
-  const client = new Client(dbOptions);
-  await client.connect();
-  const { description, price, title, image, count } = JSON.parse(event.body.replace(/'/g, "''"));
+  const product = event.Records.map(({ body }) => JSON.parse(body));
+  console.log('products: ', product);
+
+  const { description, price: priceSt, title, image, count: countSt } = product[0];
+  const price = parseInt(priceSt);
+  const count = parseInt(countSt);
 
   if (
     typeof description !== 'string' ||
@@ -24,6 +26,25 @@ export const setProduct = async event => {
       body: JSON.stringify({ message: 'Bad request, parameters of product is required' })
     };
   }
+
+  const sns = new AWS.SNS();
+  sns.publish({
+    Subject: 'New product',
+    Message: JSON.stringify(product),
+    TopicArn: process.env.SNS_ARN,
+    MessageAttributes: {
+      title: {
+        DataType: "String",
+        StringValue: product[0].title
+      }
+    }
+  }, (err, data) => {
+    if (err) console.log(err, err.stack);
+    else     console.log('Send email for: ', data);
+  });
+
+  const client = new Client(dbOptions);
+  await client.connect();
 
   try {
     const id = uuid();
