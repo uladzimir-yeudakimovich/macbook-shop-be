@@ -1,7 +1,5 @@
 import type { Serverless } from 'serverless/aws';
 
-const { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD, SNS_ARN } = process.env;
-
 const serverlessConfiguration: Serverless = {
   service: {
     name: 'product-service',
@@ -22,6 +20,11 @@ const serverlessConfiguration: Serverless = {
     iamRoleStatements: [
       {
         Effect: 'Allow',
+        Action: 'sqs:*',
+        Resource: { 'Fn::GetAtt': ['SQSQueue', 'Arn'] },
+      },
+      {
+        Effect: 'Allow',
         Action: 'sns:*',
         Resource: [
           {
@@ -33,10 +36,20 @@ const serverlessConfiguration: Serverless = {
     apiGateway: {
       minimumCompressionSize: 1024,
     },
-    environment: { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD, SNS_ARN },
+    environment: {
+      SNS_ARN: {
+        Ref: 'SNSTopic' 
+      }
+    }
   },
   resources: {
     Resources: {
+      SQSQueue: {
+        Type: 'AWS::SQS::Queue',
+        Properties: {
+          QueueName: 'catalogItemsQueue',
+        },
+      },
       SNSTopic: {
         Type: 'AWS::SNS::Topic',
         Properties: {
@@ -65,8 +78,20 @@ const serverlessConfiguration: Serverless = {
             title: ['Apple MacBook Pro']
           }
         }
-      }
-    }
+      },
+    },
+    Outputs: {
+      SQSQueueUrl: {
+        Value: {
+          Ref: 'SQSQueue',
+        }
+      },
+      SQSQueueArn: {
+        Value: {
+          'Fn::GetAtt': ['SQSQueue', 'Arn'],
+        }
+      },
+    },
   },
   functions: {
     getProductsList: {
@@ -149,7 +174,9 @@ const serverlessConfiguration: Serverless = {
         {
           sqs: {
             batchSize: 5,
-            arn: '${cf:import-service-${self:provider.stage}.SQSQueueArn}'
+            arn: {
+              'Fn::GetAtt': ['SQSQueue', 'Arn'],
+            },
           }
         }
       ]
