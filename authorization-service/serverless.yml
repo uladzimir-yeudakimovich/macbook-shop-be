@@ -14,3 +14,5 @@ provider:
 functions:
   tokenAuth:
     handler: handler.basicAuthorizer
+  requestAuth:
+    handler: handler.requestAuthorizer
