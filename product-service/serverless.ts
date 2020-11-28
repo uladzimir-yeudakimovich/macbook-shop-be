@@ -21,7 +21,9 @@ const serverlessConfiguration: Serverless = {
       {
         Effect: 'Allow',
         Action: 'sqs:*',
-        Resource: { 'Fn::GetAtt': ['SQSQueue', 'Arn'] },
+        Resource: {
+          'Fn::GetAtt': ['SQSQueue', 'Arn']
+        },
       },
       {
         Effect: 'Allow',
@@ -79,6 +81,19 @@ const serverlessConfiguration: Serverless = {
           }
         }
       },
+      GatewayResponseUnauthorized: {
+        Type: 'AWS::ApiGateway::GatewayResponse',
+        Properties: {
+          ResponseParameters: {
+            'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+            'gatewayresponse.header.Access-Control-Allow-Credentials': "'true'"
+          },
+          ResponseType: "UNAUTHORIZED",
+          RestApiId: {
+            Ref: "ApiGatewayRestApi"
+          }
+        }
+      }
     },
     Outputs: {
       SQSQueueUrl: {
@@ -101,7 +116,13 @@ const serverlessConfiguration: Serverless = {
           http: {
             method: 'get',
             path: 'products',
-            cors: true
+            cors: true,
+            authorizer: {
+              name: 'cognitoAuthorizer',
+              type: 'COGNITO_USER_POOLS',
+              arn: 'arn:aws:cognito-idp:eu-west-1:714652663732:userpool/eu-west-1_zTPf140Wi',
+              identitySource: 'method.request.header.Authorization'
+            }
           }
         }
       ]
