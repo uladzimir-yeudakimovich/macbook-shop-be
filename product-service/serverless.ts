@@ -61,7 +61,7 @@ const serverlessConfiguration: Serverless = {
       SNSSubscriptionAir: {
         Type: 'AWS::SNS::Subscription',
         Properties: {
-          Endpoint: 'uladzimir.yeudakimovich@gmail.com',
+          Endpoint: '${env:EMAIL_AIR}',
           Protocol: 'email',
           TopicArn: {
             Ref: 'SNSTopic'
@@ -71,7 +71,7 @@ const serverlessConfiguration: Serverless = {
       SNSSubscriptionPro: {
         Type: 'AWS::SNS::Subscription',
         Properties: {
-          Endpoint: 'berkut2426@gmail.com',
+          Endpoint: '${env:EMAIL_PRO}',
           Protocol: 'email',
           TopicArn: {
             Ref: 'SNSTopic'
@@ -120,7 +120,7 @@ const serverlessConfiguration: Serverless = {
             // authorizer: {
             //   name: 'cognitoAuthorizer',
             //   type: 'COGNITO_USER_POOLS',
-            //   arn: 'arn:aws:cognito-idp:eu-west-1:714652663732:userpool/eu-west-1_zTPf140Wi',
+            //   arn: '${env:COGNITO_ARN}',
             //   identitySource: 'method.request.header.Authorization'
             // }
           }
