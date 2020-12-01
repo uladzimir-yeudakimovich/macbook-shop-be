@@ -1,7 +1,5 @@
 import type { Serverless } from 'serverless/aws';
 
-const { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD, SNS_ARN } = process.env;
-
 const serverlessConfiguration: Serverless = {
   service: {
     name: 'product-service',
@@ -22,6 +20,13 @@ const serverlessConfiguration: Serverless = {
     iamRoleStatements: [
       {
         Effect: 'Allow',
+        Action: 'sqs:*',
+        Resource: {
+          'Fn::GetAtt': ['SQSQueue', 'Arn']
+        },
+      },
+      {
+        Effect: 'Allow',
         Action: 'sns:*',
         Resource: [
           {
@@ -33,10 +38,20 @@ const serverlessConfiguration: Serverless = {
     apiGateway: {
       minimumCompressionSize: 1024,
     },
-    environment: { PG_HOST, PG_PORT, PG_DATABASE, PG_USER, PG_PASSWORD, SNS_ARN },
+    environment: {
+      SNS_ARN: {
+        Ref: 'SNSTopic' 
+      }
+    }
   },
   resources: {
     Resources: {
+      SQSQueue: {
+        Type: 'AWS::SQS::Queue',
+        Properties: {
+          QueueName: 'catalogItemsQueue',
+        },
+      },
       SNSTopic: {
         Type: 'AWS::SNS::Topic',
         Properties: {
@@ -65,8 +80,33 @@ const serverlessConfiguration: Serverless = {
             title: ['Apple MacBook Pro']
           }
         }
+      },
+      GatewayResponseUnauthorized: {
+        Type: 'AWS::ApiGateway::GatewayResponse',
+        Properties: {
+          ResponseParameters: {
+            'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+            'gatewayresponse.header.Access-Control-Allow-Credentials': "'true'"
+          },
+          ResponseType: "UNAUTHORIZED",
+          RestApiId: {
+            Ref: "ApiGatewayRestApi"
+          }
+        }
       }
-    }
+    },
+    Outputs: {
+      SQSQueueUrl: {
+        Value: {
+          Ref: 'SQSQueue',
+        }
+      },
+      SQSQueueArn: {
+        Value: {
+          'Fn::GetAtt': ['SQSQueue', 'Arn'],
+        }
+      },
+    },
   },
   functions: {
     getProductsList: {
@@ -76,7 +116,13 @@ const serverlessConfiguration: Serverless = {
           http: {
             method: 'get',
             path: 'products',
-            cors: true
+            cors: true,
+            authorizer: {
+              name: 'cognitoAuthorizer',
+              type: 'COGNITO_USER_POOLS',
+              arn: 'arn:aws:cognito-idp:eu-west-1:714652663732:userpool/eu-west-1_zTPf140Wi',
+              identitySource: 'method.request.header.Authorization'
+            }
           }
         }
       ]
@@ -149,7 +195,9 @@ const serverlessConfiguration: Serverless = {
         {
           sqs: {
             batchSize: 5,
-            arn: '${cf:import-service-${self:provider.stage}.SQSQueueArn}'
+            arn: {
+              'Fn::GetAtt': ['SQSQueue', 'Arn'],
+            },
           }
         }
       ]
