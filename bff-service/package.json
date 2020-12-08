@@ -7,7 +7,7 @@
     "start": "nodemon index.js",
     "eb-init": "eb init --platform node.js --region eu-west-1",
     "eb-create": "eb create uladzimiryeudakimovich-bff-api --single --cname uladzimiryeudakimovich-bff-api-dev",
-    "eb-terminate": "eb-terminate"
+    "eb-terminate": "eb terminate"
   },
   "license": "ISC",
   "dependencies": {
