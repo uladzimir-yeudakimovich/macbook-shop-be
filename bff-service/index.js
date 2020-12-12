@@ -5,15 +5,39 @@ const axios = require('axios').default;
 const app = express();
 const PORT = process.env.PORT | 3001;
 
+app.use(express.json());
+
 app.use((req, res, next) => {
   res.header({
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Authorization'
+    'Access-Control-Allow-Headers': 'Authorization, content-type',
+    'Access-Control-Allow-Methods': 'PUT'
   });
   next();
 });
 
-app.use(express.json());
+const memoryCache = {};
+
+const dataFromCache = (req, res, next) => {
+  const key = req.originalUrl;
+  if (memoryCache[key]) {
+    console.log(`Data from cache: ${memoryCache[key].body}`);
+    res.send(memoryCache[key].body);
+  } else {
+    res.sendResponse = res.send;
+    res.send = body => {
+      memoryCache[key] = { body };
+      console.log(`Data to cache: ${memoryCache[key].body}`);
+      res.sendResponse(body);
+      setTimeout(() => memoryCache[key] = null, 1000 * 60 * 2);
+    };
+    next();
+  }
+};
+
+app.get('/products', dataFromCache, (req, res, next) => {
+  next();
+})
 
 app.all('/*', (req, res) => {
   console.log('originalUrl: ', req.originalUrl);
