@@ -3,10 +3,16 @@ require('dotenv').config;
 const axios = require('axios').default;
 
 const app = express();
-const cors = require('cors');
 const PORT = process.env.PORT | 3001;
 
-app.use(cors());
+app.use((req, res, next) => {
+  res.header({
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Authorization'
+  });
+  next();
+});
+
 app.use(express.json());
 
 app.all('/*', (req, res) => {

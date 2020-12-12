@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "app-dev": "nodemon index.js",
+    "app-dev": "set products=https://mlmufxfj36.execute-api.eu-west-1.amazonaws.com/dev&& set profile=http://macbook-cart-api.eu-west-1.elasticbeanstalk.com/api&& nodemon index.js",
     "eb-init": "eb init --platform node.js --region eu-west-1",
     "eb-create": "eb create uladzimiryeudakimovich-bff-api --single --cname uladzimiryeudakimovich-bff-api-dev",
     "eb-terminate": "eb terminate",
@@ -14,7 +14,6 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.0",
-    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1"
   },
