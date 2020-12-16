@@ -1,0 +1,10 @@
+# package directories
+node_modules
+
+# environment
+.env.eb
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
